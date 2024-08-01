@@ -4,7 +4,8 @@ from database import DBConnection
 from contextlib import asynccontextmanager
 import os
 import dotenv
-from services import auth, upload_image
+from routes import upload_image
+from services import auth
 
 
 dotenv.load_dotenv()

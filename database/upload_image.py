@@ -45,3 +45,15 @@ class AssetDB:
         asset = await self.assets_collection.find_one(sort=[("_id", DESCENDING)]) # Find the newest document
         return asset
     
+    async def get_user_assets(self, user_id):
+        projection = {
+            "_id": 1,
+        }
+
+        assets = await self.assets_collection.find({"user_id": user_id}, projection).to_list(length=None)
+        return assets
+    
+    async def delete_asset(self, asset_id, user_id):
+        await self.assets_collection.delete_one({"_id": ObjectId(asset_id), "user_id": user_id})
+        return True
+    
