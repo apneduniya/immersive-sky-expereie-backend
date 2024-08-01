@@ -46,7 +46,7 @@ async def get_assets_scatter():
 @router.get('/id/{asset_id}', response_description="Get asset by ID", status_code=status.HTTP_200_OK)
 async def get_asset(asset_id: str):
     asset = await asset_db.get_asset(asset_id)
-    return AssetBase(**asset).model_dump(by_alias=True, exclude=["id"])
+    return AssetBase(**asset).model_dump(by_alias=True)
 
 
 @router.delete('/id/{asset_id}', response_description="Delete asset by ID", status_code=status.HTTP_204_NO_CONTENT)
@@ -58,11 +58,12 @@ async def delete_asset(asset_id: str, current_user: UserBase = Depends(get_curre
     
     asset = AssetBase(**asset)
     
-    if asset.user_id != current_user["_id"]:
+    if str(asset.user_id) != str(current_user["_id"]):
+        print(asset.user_id, current_user["_id"])
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to delete this asset")
     
     # Proceed with deletion
-    await asset_db.delete_asset(asset_id)
+    await asset_db.delete_asset(asset_id, current_user["_id"])
     return {"message": "Asset deleted successfully"}
 
 
