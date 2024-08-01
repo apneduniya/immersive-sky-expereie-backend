@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build & Deploy
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_KEY }}
+          HOSTNAME: ${{ secrets.EC2_HOST }}
+          USERNAME: ${{ secrets.EC2_USER }}  
+        run: |
+          # Write private key to a file and set permissions
+          echo "$PRIVATE_KEY" > private_key
+          chmod 600 private_key
+
+          # Execute deployment commands on EC2
+          ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOSTNAME} << 'EOF'
+            cd /home/ec2-user/immersive-sky-expereie-backend  # Adjust this to your application's directory
+            git pull origin main
+            pip3 install -r requirements.txt
+            sudo systemctl restart myapp
+          EOF
+
+          # Clean up private key file
+          rm private_key
