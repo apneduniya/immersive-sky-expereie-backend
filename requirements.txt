@@ -3,3 +3,5 @@ passlib == 1.7.4
 python-jose == 3.3.0
 pydantic == 2.8.2
 uvicorn == 0.30.3
+pydantic[email]
+python-multipart == 0.0.9

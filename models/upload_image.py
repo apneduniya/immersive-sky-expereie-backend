@@ -32,10 +32,10 @@ class AssetBase(BaseModel):
     iso: Optional[str] = Field(None, description="ISO setting used in the camera")
     shutterSpeed: Optional[str] = Field(None, description="Shutter speed setting used in the camera")
     aperture: Optional[str] = Field(None, description="Aperture setting used in the camera")
-    photo: Optional[str] = Field(None, description="URL or path to the photo")
-    video: Optional[str] = Field(None, description="URL or path to the video")
-    audio: Optional[str] = Field(None, description="URL or path to the audio")
-    sound: Optional[str] = Field(None, description="Sound description or details")
+    photo: Optional[bool] = Field(None, description="If the asset is a photo")
+    video: Optional[bool] = Field(None, description="If the asset is a video")
+    audio: Optional[bool] = Field(None, description="If the asset is an audio")
+    sound: Optional[bool] = Field(None, description="If the asset is a sound")
     fileName: Optional[str] = Field(None, description="Name of the file")
     fileSize: Optional[str] = Field(None, description="Size of the file")
     fileType: Optional[str] = Field(None, description="Type of the file")
@@ -75,10 +75,10 @@ class AssetBase(BaseModel):
                 "iso": "100",
                 "shutterSpeed": "1/100",
                 "aperture": "f/2.8",
-                "photo": "https://www.example.com/image.jpg",
-                "video": "https://www.example.com/video.mp4",
-                "audio": "https://www.example.com/audio.mp3",
-                "sound": "Sound of heavy rain",
+                "photo": True,
+                "video": False,
+                "audio": False,
+                "sound": False,
                 "fileName": "flood_city_a.jpg",
                 "fileSize": "2MB",
                 "fileType": "image/jpeg",

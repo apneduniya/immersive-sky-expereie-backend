@@ -57,3 +57,12 @@ class AssetDB:
         await self.assets_collection.delete_one({"_id": ObjectId(asset_id), "user_id": user_id})
         return True
     
+    async def get_latest_slogan(self):
+        projection = {
+            "forecastAndStories": 1,
+            "src": 1
+        }
+
+        slogan = await self.assets_collection.find_one(sort=[("_id", DESCENDING)], projection=projection)
+        return slogan
+    

@@ -74,3 +74,10 @@ async def get_user_assets(current_user: UserBase = Depends(get_current_active_us
     return [AssetBase(**asset).model_dump(by_alias=True, include=["id"]) for asset in assets]
 
 
+@router.get('/slogan', response_description="Get latest slogan", status_code=status.HTTP_200_OK)
+async def get_latest_slogan():
+    slogan = await asset_db.get_latest_slogan()
+
+    return AssetBase(**slogan).model_dump(by_alias=True, include=["forecastAndStories", "src"])
+
+
