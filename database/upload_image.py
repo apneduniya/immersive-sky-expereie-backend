@@ -90,3 +90,44 @@ class AssetDB:
 
         slogan = await self.assets_collection.find_one(sort=[("_id", DESCENDING)], projection=projection)
         return slogan
+    
+    async def search_assets(self, disaster = None, device = None, modelNo = None, search = None, photo = None, video = None, audio = None, archival = None, document = None, portfolio = None, event = None, place = None, date = None, day = None):
+        projection = {
+            "_id": 1,
+            "src": 1,
+            "created_at": 1
+        }
+
+        search_query = []
+        if disaster:
+            search_query.append({"disaster": disaster})
+        if device:
+            search_query.append({"device": device})
+        if modelNo:
+            search_query.append({"cameraModel": modelNo})
+        if search:
+            search_query.append({"keywords": search})
+        if photo:
+            search_query.append({"photo": True})
+        if video:
+            search_query.append({"video": True})
+        if audio:
+            search_query.append({"audio": True})
+        if archival:
+            search_query.append({"archival": archival})
+        if document:
+            search_query.append({"document": document})
+        # if portfolio:
+        #     search_query.append({"portfolio": portfolio})
+        if event:
+            search_query.append({"title": event})
+        if place:
+            search_query.append({"place": place})
+        if date:
+            search_query.append({"date": date})
+        if day:
+            search_query.append({"day": day})
+        
+
+        assets = await self.assets_collection.find({"$and": search_query}, projection).to_list(length=None)
+        return assets

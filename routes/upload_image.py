@@ -81,3 +81,18 @@ async def get_latest_slogan():
     return AssetBase(**slogan).model_dump(by_alias=True, include=["forecastAndStories", "src"])
 
 
+@router.get('/search/', response_description="Search assets", status_code=status.HTTP_200_OK)
+async def search_assets(disaster: str = None, device: str = None, modelNo: str = None, search: str = None, photo: bool = None, video: bool = None, audio: bool = None, archival: str = None, document: str = None, portfolio: str = None, event: str = None, place: str = None, date: str = None, day: str = None):
+    assets = await asset_db.search_assets(disaster, device, modelNo, search, photo, video, audio, archival, document, portfolio, event, place, date, day)
+
+    if not assets:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No assets found")
+
+    scatter_assets = []
+    for asset in assets:
+        asset["scale"] = get_scale_value(asset["created_at"])
+        scatter_assets.append(AssetScatter(**asset).model_dump(by_alias=True, include=["src", "scale", "id"]))
+
+    return scatter_assets
+
+
