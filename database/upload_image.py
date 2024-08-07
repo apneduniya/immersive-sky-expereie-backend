@@ -3,7 +3,7 @@ from pymongo import DESCENDING
 from bson import ObjectId
 import dotenv
 import os
-
+from datetime import datetime, timedelta
 
 
 dotenv.load_dotenv()
@@ -26,7 +26,7 @@ class AssetDB:
         new_asset = await self.assets_collection.insert_one(asset_data)
         new_asset_id = str(new_asset.inserted_id)
         return new_asset_id
-    
+
     async def get_scatter_assets(self):
         projection = {
             "_id": 1,
@@ -40,11 +40,36 @@ class AssetDB:
     async def get_asset(self, asset_id):
         asset = await self.assets_collection.find_one({"_id": ObjectId(asset_id)})
         return asset
-    
+
     async def get_newest_asset(self):
-        asset = await self.assets_collection.find_one(sort=[("_id", DESCENDING)]) # Find the newest document
-        return asset
-    
+        """
+        This function retrieves the most recent asset that was uploaded within the last 5 minutes.
+        If no assets meet this criteria, it returns the latest asset regardless of upload time.
+
+        The process works as follows:
+        1. Calculate the current time and the time 5 minutes ago.
+        2. Fetch assets from the collection, sorted by their creation time in descending order (latest first).
+        3. Iterate through the assets to find the first one uploaded within the last 5 minutes.
+        4. Return the found asset.
+        5. If no asset is found within the last 5 minutes, return the latest asset in the collection.
+
+        This ensures that each new asset gets at least 5 minutes of display time before the next one is shown.
+        """
+        current_time = datetime.now()
+        five_minutes_ago = current_time - timedelta(minutes=5)
+
+        cursor = self.assets_collection.find().sort([("_id", DESCENDING)])
+
+        async for asset in cursor:
+            asset_time = datetime.strptime(
+                str(asset["created_at"]), "%Y-%m-%d %H:%M:%S")
+            if asset_time > five_minutes_ago: # If the asset was uploaded is within or just first after the last 5 minutes
+                return asset
+
+        # If no asset is found within the last 5 minutes, return the latest one
+        latest_asset = await self.assets_collection.find_one(sort=[("_id", DESCENDING)])
+        return latest_asset
+
     async def get_user_assets(self, user_id):
         projection = {
             "_id": 1,
@@ -52,11 +77,11 @@ class AssetDB:
 
         assets = await self.assets_collection.find({"user_id": user_id}, projection).to_list(length=None)
         return assets
-    
+
     async def delete_asset(self, asset_id, user_id):
         await self.assets_collection.delete_one({"_id": ObjectId(asset_id), "user_id": user_id})
         return True
-    
+
     async def get_latest_slogan(self):
         projection = {
             "forecastAndStories": 1,
@@ -65,4 +90,3 @@ class AssetDB:
 
         slogan = await self.assets_collection.find_one(sort=[("_id", DESCENDING)], projection=projection)
         return slogan
-    

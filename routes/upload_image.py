@@ -28,7 +28,7 @@ async def create_asset(asset: AssetBase = Body(...), current_user: UserBase = De
 async def get_new_asset():
     asset = await asset_db.get_newest_asset()
 
-    return AssetBase(**asset).model_dump(include=("src"))
+    return AssetBase(**asset).model_dump(include=("src", "keywords", "geolocation"))
 
 
 @router.get('/scatter', response_description="Get all assets for scatter page", status_code=status.HTTP_200_OK)
