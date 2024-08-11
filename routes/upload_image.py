@@ -121,5 +121,5 @@ async def process_image_endpoint(image_url: HttpUrl):
 async def get_all_assets():
     assets = await asset_db.get_all_assets()
 
-    return [AssetBase(**asset).model_dump(by_alias=True, include=["src", "_id", "forecastAndStories"]) for asset in assets]
+    return [AssetBase(**asset).model_dump(by_alias=True, include=["src", "id", "forecastAndStories"]) for asset in assets]
 
