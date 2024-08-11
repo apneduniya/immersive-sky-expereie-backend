@@ -139,5 +139,5 @@ class AssetDB:
             "forecastAndStories": 1,
         }
 
-        assets = await self.assets_collection.find({}, projection).to_list(length=None)
+        assets = await self.assets_collection.find({}, projection).sort([("_id", DESCENDING)]).to_list(length=None)
         return assets
