@@ -131,3 +131,13 @@ class AssetDB:
 
         assets = await self.assets_collection.find({"$and": search_query}, projection).to_list(length=None)
         return assets
+    
+    async def get_all_assets(self):
+        projection = {
+            "_id": 1,
+            "src": 1,
+            "forecastAndStories": 1,
+        }
+
+        assets = await self.assets_collection.find({}, projection).to_list(length=None)
+        return assets
