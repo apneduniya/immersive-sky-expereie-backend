@@ -117,7 +117,7 @@ async def process_image_endpoint(image_url: HttpUrl):
     return {"image_base64": img_base64}
 
 
-@router.post("/all", response_description="Get all assets", status_code=status.HTTP_200_OK)
+@router.get("/all", response_description="Get all assets", status_code=status.HTTP_200_OK)
 async def get_all_assets():
     assets = await asset_db.get_all_assets()
 
