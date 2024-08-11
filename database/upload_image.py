@@ -75,7 +75,7 @@ class AssetDB:
             "_id": 1,
         }
 
-        assets = await self.assets_collection.find({"user_id": user_id}, projection).to_list(length=None)
+        assets = await self.assets_collection.find({"user_id": user_id}, projection).sort([("_id", DESCENDING)]).to_list(length=None)
         return assets
 
     async def delete_asset(self, asset_id, user_id):

@@ -123,5 +123,3 @@ async def get_all_assets():
 
     return [AssetBase(**asset).model_dump(by_alias=True, include=["src", "_id", "forecastAndStories"]) for asset in assets]
 
-
-
