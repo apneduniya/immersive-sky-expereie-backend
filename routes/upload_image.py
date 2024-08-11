@@ -8,6 +8,12 @@ from utils.auth import (
     get_current_active_user
 )
 from utils.scale_image import get_scale_value
+import requests
+from utils.image_edit import image_to_base64, process_image
+from PIL import Image
+from io import BytesIO
+import numpy as np
+from pydantic.networks import HttpUrl
 
 
 router = APIRouter()
@@ -94,5 +100,20 @@ async def search_assets(disaster: str = None, device: str = None, modelNo: str =
         scatter_assets.append(AssetScatter(**asset).model_dump(by_alias=True, include=["src", "scale", "id"]))
 
     return scatter_assets
+
+
+@router.post("/process_image", response_description="Process image from URL", status_code=status.HTTP_200_OK)
+async def process_image_endpoint(image_url: HttpUrl):
+    # Get the image from the URL
+    response = requests.get(image_url)
+    img_array = np.array(Image.open(BytesIO(response.content)))
+
+    # Process the image
+    processed_img = process_image(img_array)
+
+    # Convert the processed image to base64
+    img_base64 = image_to_base64(processed_img)
+
+    return {"image_base64": img_base64}
 
 

@@ -17,7 +17,7 @@ ASSETS_COLLECTION_NAME = "assets"
 
 
 class AssetDB:
-    def __init__(self):
+    def __init__(self): 
         self.client = MongoClient(MONGO_CONNECTION_URL)
         self.db = self.client[DATABASE_NAME]
         self.assets_collection = self.db.get_collection(ASSETS_COLLECTION_NAME)
