@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Body, HTTPException
 from starlette import status
 from models.users import UserBase
-from models.upload_image import AssetBase, AssetScatter
+from models.upload_image import AssetBase, AssetScatter, AssetProcess
 from database.upload_image import AssetDB
 import datetime
 from utils.auth import (
@@ -13,7 +13,6 @@ from utils.image_edit import image_to_base64, process_image
 from PIL import Image
 from io import BytesIO
 import numpy as np
-from pydantic.networks import HttpUrl
 
 
 router = APIRouter()
@@ -21,9 +20,9 @@ asset_db = AssetDB()
 
 
 @router.post('/create', response_description="Create new asset", status_code=status.HTTP_201_CREATED)
-async def create_asset(asset: AssetBase = Body(...), current_user: UserBase = Depends(get_current_active_user)):
+async def create_asset(asset: AssetBase = Body(...)):
 
-    asset.user_id = current_user["_id"]
+    # asset.user_id = current_user["_id"]
     asset.created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     new_asset = await asset_db.create_asset(asset.model_dump(by_alias=True, exclude=["id"]))
@@ -103,9 +102,9 @@ async def search_assets(disaster: str = None, device: str = None, modelNo: str =
 
 
 @router.post("/process_image", response_description="Process image from URL", status_code=status.HTTP_200_OK)
-async def process_image_endpoint(image_url: HttpUrl):
+async def process_image_endpoint(asset: AssetProcess = Body(...)):
     # Get the image from the URL
-    response = requests.get(image_url)
+    response = requests.get(asset.image_url)
     img_array = np.array(Image.open(BytesIO(response.content)))
 
     # Process the image

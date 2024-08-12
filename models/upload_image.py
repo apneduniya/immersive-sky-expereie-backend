@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, BeforeValidator, ConfigDict
+from pydantic.networks import HttpUrl
 from typing import Optional, Annotated
 
 
@@ -42,7 +43,7 @@ class AssetBase(BaseModel):
     archival: Optional[str] = Field(None, description="Archival information or status")
     document: Optional[str] = Field(None, description="Document related to the event or record")
     src: Optional[str] = Field(None, description="Image sources")
-    user_id: Optional[PyObjectId] = Field(None, alias="user_id", description="User ID if available") # This will be aliased to `user_id` when sent to MongoDB, but provided as `user_id` in the API requests and responses.
+    user_id: Optional[PyObjectId] = Field(default="guest", alias="user_id", description="User ID if available") # This will be aliased to `user_id` when sent to MongoDB, but provided as `user_id` in the API requests and responses.
     created_at: Optional[str] = Field(None, description="Date and time of creation")
 
     model_config = ConfigDict(
@@ -103,6 +104,19 @@ class AssetScatter(AssetBase):
                 "_id": "5f4f7b4e5e9c4f001f6d8a4c",
                 "src": "https://www.example.com/image.jpg",
                 "scale": 0.5
+            }
+        },
+    )
+
+class AssetProcess(BaseModel):
+    image_url: HttpUrl = Field(..., description="URL of the image to be processed")
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_schema_extra={
+            "example": {
+                "image_url": "https://www.example.com/image.jpg"
             }
         },
     )
