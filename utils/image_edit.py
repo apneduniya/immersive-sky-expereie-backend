@@ -5,31 +5,30 @@ from PIL import Image
 import base64
 
 def process_image(img: np.ndarray) -> np.ndarray:
-    # Convert the image to the HSV color space
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    # Get the dimensions of the image
+    height, width, _ = img.shape
 
-    # Define a range of blue color in the HSV color space
-    lower_blue = np.array([110, 50, 50])
-    upper_blue = np.array([130, 255, 255])
+    # Define the cropping region (top 30% of the image)
+    crop_height = int(height * 0.3)  # Adjust 0.3 to increase or decrease the crop
 
-    # Create a binary mask
-    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+    # Crop the top part of the image
+    sky = img[:crop_height, :]
+    sky = cv2.cvtColor(sky, cv2.COLOR_BGR2RGB)
 
-    # Apply the binary mask to the image
-    sky = cv2.bitwise_and(img, img, mask=mask)
+    # # Find the coordinates of the square
+    # contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # if contours:
+    #     cnt = max(contours, key=cv2.contourArea)
+    #     x, y, w, h = cv2.boundingRect(cnt)
 
-    # Find the coordinates of the square
-    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    if contours:
-        cnt = max(contours, key=cv2.contourArea)
-        x, y, w, h = cv2.boundingRect(cnt)
+    #     # Create the rectangular ROI
+    #     roi = sky[y:y+h, x:x+w]
+    #     return roi
+    # else:
+    #     # Return the original image if no blue sky is detected
+    #     return img
 
-        # Create the rectangular ROI
-        roi = sky[y:y+h, x:x+w]
-        return roi
-    else:
-        # Return the original image if no blue sky is detected
-        return img
+    return sky
 
 def image_to_base64(img: np.ndarray) -> str:
     _, buffer = cv2.imencode('.jpg', img)
